@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.13.1
+----------------------
+
+  o added flag 'isSecondaryAlignment=FALSE' for reading bam files in 'get.reads', such that only unique (primary) alignments are considered for TEQC analysis
+
+
 CHANGES IN VERSION 3.11.1
 ----------------------
 

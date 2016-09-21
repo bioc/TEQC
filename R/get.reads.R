@@ -3,18 +3,17 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
 
   filetype <- match.arg(filetype)
   
-# !! check whether filetype was not specified as 'bam', but readsfile is actually a 'bam' file
   if(length(grep(".bam$", readsfile) == 0) & filetype == "bed"){
     filetype <- "bam"
     message("'filetype' was changed to 'bam'")
   }
-# !!
-  
+
   if(filetype == "bam"){
     # read BAM file
-    param <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE), what=c("qname", "pos", "qwidth", "rname"))
+# !! add flag to read only unique (primary) alignments 
+    param <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE, isSecondaryAlignment=FALSE), what=c("qname", "pos", "qwidth", "rname"))
     aln <- scanBam(readsfile, param=param)[[1]]
-
+# !!
     # create RangedData object
     rd <- with(aln, RangedData(IRanges(pos, width=qwidth), ID=qname,  space=rname))
   }
