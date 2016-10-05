@@ -18,11 +18,17 @@ function(targetsfile, chrcol=1, startcol=2, endcol=3, zerobased=TRUE, sep="\t", 
 
   # make RangedData object
   rd <- RangedData(ranges=ir, space=dat[,chrcol])
+  # or GRanges, since use of RangedData is discouraged...
+  #gr <- as(rd, "GRanges")
 
   # print number of targets and, if applicable, number of non-overlapping targets
   n.targ <- nrow(rd)
-  rd <- reduce(rd)
+  #rd <- reduce(rd)
+  # 'reduce()' for 'RangedData' objects was deprecated in BioC 3.3 -> for now just copy the method into 'myreduce()'... (and replace other deprecated functions within)
+  rd <- myreduce(rd)
   n.targ.no <- nrow(rd)
+  #gr <- reduce(gr)
+  #n.targ.no <- length(gr)
   if(n.targ == n.targ.no)
     print(paste("read", n.targ, "(non-overlapping) target regions"))
   else
@@ -30,5 +36,6 @@ function(targetsfile, chrcol=1, startcol=2, endcol=3, zerobased=TRUE, sep="\t", 
 
   # return non-overlapping targets
   return(rd)
+  #return(gr)
 }
 

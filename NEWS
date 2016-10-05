@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.13.2
+----------------------
+
+  o since 'reduce' method for 'RangedData' objects was deprecated, copied its content to function within package. Transition from 'RangedData' to 'GRanges' objects all over the package should be pursued...
+
+
 CHANGES IN VERSION 3.13.1
 ----------------------
 
