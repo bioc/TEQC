@@ -6,17 +6,15 @@ function(reads, targets, Offset=0, perTarget=TRUE, perBase=TRUE){
 
   # get largest position per chromosome - either target or reads position
   max.targ <- end(range(targets))
+  names(max.targ) <- seqnames(range(targets))
   chr.targ <- names(max.targ)
   max.read <- end(range(reads))
-
-  w <- sapply(max.read, length) == 0
-  reads <- reads[!w]
-  max.read <- max.read[!w]
+  names(max.read) <- seqnames(range(reads))
 
   # if on a chromosome there are targets but no reads
   noread <- setdiff(chr.targ, names(max.read))
 
-  sel <- setdiff(chr.targ, noread)
+  sel <- as.character(setdiff(chr.targ, noread))
   tmp <- max.read[sel] < max.targ[sel]
   max.read[sel][tmp] <- max.targ[sel][tmp]
 
@@ -36,15 +34,11 @@ function(reads, targets, Offset=0, perTarget=TRUE, perBase=TRUE){
   covercounts.target <- RleList()
   targetcov <- targetSD <- NULL
 
-#!! BUG fix
-#  for(chr in names(covercounts.all)){  -> chr's don't come in order of chr.targ (when reads come from bam file)
-#    if(chr %in% chr.targ){             -> avgCoverage, coverageSD and coverageTarget outputs are wrong !!
    for(chr in chr.targ){
       cov.chr <- covercounts.all[[chr]]
-      ir.chr <- ranges(targets)[[chr]]
-      tmp <- lapply(ir.chr, function(x) cov.chr[x]) # use [ instead of
-                                                    # deprecated seqselect
-
+      ir.chr <- ranges(targets[seqnames(targets) == chr,])
+      tmp <- lapply(ir.chr, function(x) cov.chr[x]) 
+ 
       # coverage average and SD per target
       if(perTarget){
         avgcov <- sapply(tmp, mean)
@@ -56,7 +50,6 @@ function(reads, targets, Offset=0, perTarget=TRUE, perBase=TRUE){
       # coverage per base
       cov.chr <- do.call(c, tmp)
       covercounts.target <- c(covercounts.target, RleList(cov.chr))
-#    }
   }
 
   # coverage average, SD and quartiles for all targeted bases

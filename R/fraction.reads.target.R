@@ -12,7 +12,7 @@ function(reads, targets, Offset=0, mappingReads=FALSE){
   OL <- reads %over% targets
 
   # fraction of reads / read pairs mapping to targets
-  res <- sum(sum(OL)) / nrow(reads)
+  res <- sum(sum(OL)) / length(reads)
 
   # return reads that map to targets
   if(mappingReads){

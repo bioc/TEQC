@@ -8,12 +8,10 @@ multiTEQCreport <- function(singleReportDirs, samplenames, projectName="", targe
 # samplenames: names of individual samples, used for plots
 # projectName, targetsName, referenceName: names that can be chosen by user and will be placed on top of html report
 # destDir: output directory
-# k: parameter for 'covered.k()': ?k?-values for which to show fraction of target bases with coverage >= ?k?
-# !!figureFormat: format of the figures for the html report (besides pdf graphs)
+# k: parameter for 'covered.k()': k-values for which to show fraction of target bases with coverage >= ?k?
+# figureFormat: format of the figures for the html report (besides pdf graphs)
   
-  # !!
   figureFormat <- match.arg(figureFormat)
-  # !!
 
   # get/check sample directories and names
   n.samples <- length(singleReportDirs)
@@ -54,8 +52,6 @@ multiTEQCreport <- function(singleReportDirs, samplenames, projectName="", targe
   ## go through single report directories and collect results
   targetstats <- NULL
   sensilist <- list()
-#  sensi <- matrix(0, nrow=length(k), ncol=n.samples)
-#  dimnames(sensi) <- list(k, samplenames)
   perTargCov <- NULL
   for(i in 1:n.samples){
     sr <- singleReportDirs[i]
@@ -66,8 +62,6 @@ multiTEQCreport <- function(singleReportDirs, samplenames, projectName="", targe
     # sensitivity
     tmp <- read.table(paste(sr, "sensitivity.txt", sep="/"), header=TRUE)
     sensilist <- c(sensilist, list(tmp))
-#    k2 <- intersect(k, tmp$coverage)
-#    sensi[as.character(k2), i] <- tmp$fractionTargetBases[tmp$coverage %in% k2]
 
     # per-target coverage
     tmp <- read.table(paste(sr, "target_coverage.txt", sep="/"), header=TRUE, sep="\t", as.is=TRUE)
@@ -88,7 +82,6 @@ multiTEQCreport <- function(singleReportDirs, samplenames, projectName="", targe
   write.table(speci, file=file.path(destDir, "fractionReadsOnTarget.txt"), sep="\t", quote=FALSE)
 
   # average and median target coverage
-#  targcov <- data.frame(avgTargetCoverage=targetstats["avgCoverage",], medianTargetCoverage=targetstats["medianCoverage",])
   targcov <- targetstats[-1,]
   write.table(targcov, file=file.path(destDir, "targetCoverageStats.txt"), sep="\t", quote=FALSE)
 
@@ -190,7 +183,6 @@ htmlSpeciBarplot <- function(dir, speci, figureFormat, ...){
     hwriteImage(file.path(".", "image", figFile), link=file.path(".", "image", pdfFile))
 }
 
-#[
 covplot <- function(targcov){
   samplenames <- rownames(targcov)
   n.samples <- length(samplenames)
@@ -201,7 +193,6 @@ covplot <- function(targcov){
   axis(side=1, at=1:n.samples, samplenames)
   legend(x=n.samples+n.samples*.05, y=mean(targcov$avgTargetCoverage), c("average", "median"), col=c("cornflowerblue","darkorange"), pch=16:17, pt.cex=2)
 }
-#]
 
 covBoxplot <- function(targcov){
   par(mar=c(8,4,4,3), las=2)

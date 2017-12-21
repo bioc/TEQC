@@ -1,15 +1,3 @@
-# get on- and off-target read multiplicities per chromosome
-multfun <- function(x){
-  if(nrow(x) > 0){
-    r <- sort(x$ranges)  # just in case reads are not sorted
-    dups <- Rle(duplicated(r))
-    m <- runLength(dups)[runValue(dups)] + 1  # -> reads with > 1 copies
-    m1 <- nrow(x) - sum(m)                    # -> unique reads
-    c("1"=m1, table(m))
-  }
-}
-
-
 duplicates.barplot <-
 function(reads, targets, returnDups=FALSE, truncateX, col=c("red","lightblue"), xlab, ylab, ylim, ...){
 
@@ -22,17 +10,15 @@ function(reads, targets, returnDups=FALSE, truncateX, col=c("red","lightblue"), 
   reads.on <- reads[on.target,]
   reads.off <- reads[!on.target,]
 
-  multi.on <- unlist(lapply(reads.on, multfun))
-  multi.off <- unlist(lapply(reads.off, multfun))
-
-  # summarize over chromosomes
-  m.on <- sapply(strsplit(names(multi.on), "\\."), function(x) x[2])
-  T1 <- tapply(multi.on, m.on, sum)
-  T1 <- T1[order(as.numeric(names(T1)))]
-  m.off <- sapply(strsplit(names(multi.off), "\\."), function(x) x[2])
-  T2 <- tapply(multi.off, m.off, sum)
-  T2 <- T2[order(as.numeric(names(T2)))]
-
+  reads.onu <- unique(reads.on)
+  reads.offu <- unique(reads.off)
+  
+  # multiplicities
+  m.on <- countOverlaps(reads.onu, reads.on, type="equal")
+  m.off <- countOverlaps(reads.offu, reads.off, type="equal")
+  T1 <- table(m.on)
+  T2 <- table(m.off)
+  
   # prepare data for barplot
   N <- union(names(T1), names(T2))
   l <- length(N)

@@ -14,8 +14,9 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
     param <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE, isSecondaryAlignment=FALSE), what=c("qname", "pos", "qwidth", "rname"))
     aln <- scanBam(readsfile, param=param)[[1]]
 # !!
-    # create RangedData object
-    rd <- with(aln, RangedData(IRanges(pos, width=qwidth), ID=qname,  space=rname))
+    # create GRanges object
+    #rd <- with(aln, RangedData(IRanges(pos, width=qwidth), ID=qname,  space=rname))
+    gr <- with(aln, GRanges(seqnames=rname, ranges=IRanges(pos, width=qwidth, names=qname)))
   }
 
   else {
@@ -30,33 +31,37 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
     dat <- read.delim(readsfile, colClasses=colclasses, sep=sep, skip=skip, header=header, ...)
 
     # sort reads (better for example when calling 'findOverlaps()' several times)
-    o <- order(dat[,chrcol], dat[,startcol])
-    if(!identical(o, 1:nrow(dat)))
-      dat <- dat[o,]
+    #o <- order(dat[,chrcol], dat[,startcol])
+    #if(!identical(o, 1:nrow(dat)))
+    #  dat <- dat[o,]
 
     # make IRanges object
-    ir <- IRanges(start=dat[,startcol], end=dat[,endcol])
-
+    if(missing(idcol))
+      ir <- IRanges(start=dat[,startcol], end=dat[,endcol])
+    else
+      ir <- IRanges(start=dat[,startcol], end=dat[,endcol], names=dat[,idcol])
+    
     # shift start position forward by 1 to go from 0-based to 1-based system
     if(zerobased)
       start(ir) <- start(ir) + 1
 
-    # make RangedData object
-    if(missing(idcol))
-      rd <- RangedData(ranges=ir, space=dat[,chrcol])
-    else
-      rd <- RangedData(ranges=ir, space=dat[,chrcol], ID=dat[,idcol])
+    # make GRanges object
+    gr <- GRanges(seqnames=dat[,chrcol], ranges=ir)
   }
 
   # check for Illumina read pair IDs - #0/1 and #0/2 have to be removed
-  if(length(colnames(rd)) > 0){
-    illu <- grep("#0/", rd$ID[1])
+  #if(length(colnames(rd)) > 0){
+    illu <- grep("#0/", names(gr))
     if(length(illu) > 0)
-      rd$ID <- gsub("#0/[[:digit:]]", "", rd$ID)
-  }
+      names(gr) <- gsub("#0/[[:digit:]]", "", names(gr))
+  #}
   
-  print(paste("read", nrow(rd), "sequenced reads"))
-  return(rd)
+  # sort reads
+  gr <- sortSeqlevels(gr)
+  gr <- sort(gr)
+
+  print(paste("read", length(gr), "sequenced reads"))
+  return(gr)
 }
 
 

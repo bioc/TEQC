@@ -3,12 +3,12 @@
 
 # get results values and plots
 TEQCreport <- function(sampleName="", targetsName="", referenceName="", destDir="TEQCreport",
-            reads=get.reads(), targets=get.targets(), Offset=0, pairedend=FALSE, genome=c(NA, "hg19", "hg18"),
+            reads=get.reads(), targets=get.targets(), Offset=0, pairedend=FALSE, genome=c(NA, "hg38", "hg19", "hg18"),
             genomesize, k=c(1, 2, 3, 5, 10, 20), covthreshold=8, CovUniformityPlot=FALSE, CovTargetLengthPlot=FALSE, CovGCPlot=FALSE,
             duplicatesPlot=FALSE, baits=get.baits(), WigFiles=FALSE, saveWorkspace=FALSE, figureFormat=c("jpeg","png","tiff")){
 # sampleName, targetsName, referenceName: names that can be chosen by user and will be placed on top of html report
 # destDir: output directory
-# reads, targets: reads/targets RangedData tables or commands how to read them
+# reads, targets: reads/targets GRanges tables or commands how to read them
 # Offset: option used in various functions to add ?Offset? bases on both sides of targeted regions
 # pairedend: are the data paired-end reads?
 # genome, genomesize: options as needed for 'fraction.target()'
@@ -52,35 +52,35 @@ TEQCreport <- function(sampleName="", targetsName="", referenceName="", destDir=
   if(CovGCPlot){
     if(missing(baits))
       stop("if 'CovGCPlot = TRUE', a 'baits' table has to be specified")
-    else if(data.class(baits) != "RangedData")
-      stop("the 'baits' table has to be of class 'RangedData'")
+    else if(data.class(baits) != "GRanges")
+      stop("the 'baits' table has to be of class 'GRanges'")
   }
 
   print("reading data...")
   if(missing(reads))
     stop("'reads' have to be specified")
     
-  if(data.class(reads) != "RangedData")
-    stop("the 'reads' table has to be of class 'RangedData'")
+  if(data.class(reads) != "GRanges")
+    stop("the 'reads' table has to be of class 'GRanges'")
 
   if(missing(targets))
     stop("'targets' have to be specified")
 
-  if(data.class(targets) != "RangedData")
-    stop("the 'targets' table has to be of class 'RangedData'")
+  if(data.class(targets) != "GRanges")
+    stop("the 'targets' table has to be of class 'GRanges'")
 
-  n.reads <- nrow(reads)
-  n.targets <- nrow(targets)
+  n.reads <- length(reads)
+  n.targets <- length(targets)
 
   if(pairedend){
     print("collapsing reads to pairs...")
     readpairs <- reads2pairs(reads)
     if(is.list(readpairs)){
-      n.pairs <- nrow(readpairs$readpairs)
-      n.singles <- nrow(readpairs$singleReads)
+      n.pairs <- length(readpairs$readpairs)
+      n.singles <- length(readpairs$singleReads)
     }
     else{
-      n.pairs <- nrow(readpairs)
+      n.pairs <- length(readpairs)
       n.singles <- 0
     }
   }
@@ -110,12 +110,8 @@ TEQCreport <- function(sampleName="", targetsName="", referenceName="", destDir=
   print("counting reads per target...")
   targetcov0 <- Coverage$targetCoverages
   
-  ## !! 05/09/2016: Offset was already added when calculating coverage.target() 
-  #     -> here we would add another Offset bases to the targets!
-  #targetcov0 <- readsPerTarget(reads, targetcov0, Offset=Offset)
   targetcov0 <- readsPerTarget(reads, targetcov0)
-  ## !!
-  
+
   targetcov <- as.data.frame(targetcov0)
   write.table(targetcov, file=file.path(destDir, "target_coverage.txt"),
               sep="\t", row.names=F, quote=F)
@@ -133,9 +129,9 @@ TEQCreport <- function(sampleName="", targetsName="", referenceName="", destDir=
   print("generating figures...")
   values <-
         list(SAMPLE=sampleName,
-             NREADS=as.character(nrow(reads)),
+             NREADS=as.character(length(reads)),
              TARGETS=targetsName,
-             NTARGETS=as.character(nrow(targets)),
+             NTARGETS=as.character(length(targets)),
              REFERENCE=referenceName,
              OFFSET=as.character(Offset),
              SPECIFICITY=hwrite(paste(round(fr*100, 2), "%", sep="")),

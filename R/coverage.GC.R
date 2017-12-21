@@ -2,7 +2,7 @@ coverage.GC <-
 function(coverageAll, baits, returnBaitValues=FALSE, linecol="darkred", lwd, xlab, ylab, pch, col, cex, ...){
 
   # get GC content
-  Seq <- unlist(values(baits), use.names=FALSE)[,1]
+  Seq <- values(baits)[,1]
   seqlen <- nchar(Seq)
   Cn <- gregexpr("C", Seq)
   Cn <- sapply(Cn, length)
@@ -13,21 +13,19 @@ function(coverageAll, baits, returnBaitValues=FALSE, linecol="darkred", lwd, xla
   # get per-bait coverage
   covercounts.baits <- RleList()
   baitcov <- NULL
-#  for(chr in unique(space(baits))){   !!
-  for(chr in names(baits)){
+  for(chr in as.character(unique(seqnames(baits)))){
      cov.chr <- coverageAll[[chr]]
-    ir.chr <- ranges(baits)[[chr]]
+    ir.chr <- ranges(baits[seqnames(baits) == chr,])
     avgcov <- viewMeans(Views(cov.chr, ir.chr))
     baitcov <- c(baitcov, avgcov)
 
     # per-base coverage
     # seqselect has to be done again on 'reduced' ranges, since baits might be overlapping!
-    cov.chr <- cov.chr[reduce(ir.chr)]  # use [ instead of deprecated seqselect
+    cov.chr <- cov.chr[reduce(ir.chr)]  
     covercounts.baits <- c(covercounts.baits, RleList(cov.chr))
   }
 
   # average coverage for bait-covered bases
-#  avgcov <- mean(as.numeric(unlist(covercounts.baits)))
   avgcov <- mean(as.integer(unlist(covercounts.baits)))
 
   # normalized per-bait coverage

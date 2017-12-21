@@ -1,3 +1,11 @@
+CHANGES IN VERSION 4.0.0
+----------------------
+
+ o package is now based on 'GRanges' objects instead of deprecated 'RangedData' objects
+
+o vignette is now created with knitr 
+
+
 CHANGES IN VERSION 3.13.2
 ----------------------
 

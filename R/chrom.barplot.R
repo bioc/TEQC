@@ -1,27 +1,22 @@
 chrom.barplot <-
-## !! 05/09/2015: add parameter 'plotchroms' such that the user can specify the chromosomes to plot
-  #   (and in the order they want)
-#function(reads, targets, col=c("darkgreen", "orange"), ylab, legendpos="topright", ...){
 function(reads, targets, plotchroms, col=c("darkgreen", "orange"), ylab, legendpos="topright", ...){
     
   # in case 'reads' is output of 'reads2pairs' and contains also 'singleReads'
   if(is.list(reads) & ("readpairs" %in% names(reads)))
     reads <- reads$readpairs  
   
-  tab0 <- table(space(reads))
+  tab0 <- table(seqnames(reads))
   chrs <- names(tab0)
   
-## !! 05/09/2015 check if specified 'plotchroms' exist in data
   if(!missing(plotchroms))
     if(!all(plotchroms %in% chrs))
       stop("'plotchroms' specify chromosome names that do not exist in the data")
-## !!
-  
+
   # if also targets are given ...
   if(!missing(targets)){
     # fraction of target - not in terms of numbers but in terms of target length
     targetlength <- width(targets)
-    tabtar <- tapply(targetlength, space(targets), sum)
+    tabtar <- tapply(targetlength, seqnames(targets), sum)
     tabtar <- tabtar / sum(tabtar)
     
     # show fractions of reads instead of absolute numbers
@@ -32,7 +27,6 @@ function(reads, targets, plotchroms, col=c("darkgreen", "orange"), ylab, legendp
     chrs <- names(tab0)
   }
 
-## !! 05/09/2015
   if(missing(plotchroms)){
     # order chromosomes
     chr <- substr(chrs, 4, 4)
@@ -48,7 +42,6 @@ function(reads, targets, plotchroms, col=c("darkgreen", "orange"), ylab, legendp
     tab <- tab0[plotchroms]
     tabtar <- tabtar[names(tabtar) %in% plotchroms]
   }
-## !!
 
   # merge per-chromosome fractions of reads and targets (if latter is given)
   if(!missing(targets)){

@@ -53,7 +53,7 @@ targets <- get.targets(targetsfile, skip=0)
 Coverage <- coverage.target(reads, targets, perBase=TRUE)
 
 ## simulate another sample
-r <- sample(nrow(reads), 0.1 * nrow(reads))
+r <- sample(length(reads), 0.1 * length(reads))
 reads2 <- reads[-r,,drop=TRUE]
 Coverage2 <- coverage.target(reads2, targets, perBase=TRUE)
 

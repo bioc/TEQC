@@ -15,7 +15,7 @@ function(coverageAll, targets, chr, Start, End, Offset=0, add=FALSE,
     covercounts <- c(covercounts, Rle(rep(0, End-L)))
 
   ir <- IRanges(start=Start, end=End)
-  covsel <- covercounts[ir]  # use [ instead of deprecated seqselect
+  covsel <- covercounts[ir]  
 
   # also stop if coverage is 0 for all bases in selected region
   if(all(covsel == 0))
@@ -40,7 +40,7 @@ function(coverageAll, targets, chr, Start, End, Offset=0, add=FALSE,
 
   # add bars showing the location of targets [+ Offset]
   if(!missing(targets)){
-    tar <- intersect(ir, ranges(targets)[[chr]])
+    tar <- intersect(ir, ranges(targets[seqnames(targets) == chr,]))
     if(length(tar) > 0){   # ... only when there are targets in the selected region
       mi <- par("usr")[3] / 2
       if(Offset > 0){

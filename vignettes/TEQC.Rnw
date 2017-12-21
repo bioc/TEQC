@@ -12,7 +12,6 @@
 
 \documentclass[a4paper]{article}
 
-\usepackage{Sweave}
 \usepackage{hyperref}
 
 \title{TEQC: Target Enrichment Quality Control}
@@ -72,17 +71,17 @@ simply allow to include information about the sample and experiment in the repor
 \noindent
 \Rcode{> library(TEQC)\\
 \\
-> exptPath <- system.file("extdata", package="TEQC")\\
+> exptPath <- system.file("extdata", package = "TEQC")\\
 > readsfile <- file.path(exptPath, "ExampleSet\_Reads.bed")\\
 > targetsfile <- file.path(exptPath, "ExampleSet\_Targets.bed")\\
 \\
-> TEQCreport(sampleName="Test Sample", \\
-+						 targetsName="Human Exome", \\
-+						 referenceName="Human Genome", \\
-+         	 destDir="report", \\
-+         	 reads=get.reads(readsfile, skip=0, idcol=4), \\
-+ 	         targets=get.targets(targetsfile, skip=0), \\
-+						 genome="hg19")}
+> TEQCreport(sampleName = "Test Sample", \\
++						 targetsName = "Human Exome", \\
++						 referenceName = "Human Genome", \\
++         	 destDir = "report", \\
++         	 reads = get.reads(readsfile, skip = 0, idcol = 4), \\
++ 	         targets = get.targets(targetsfile, skip = 0), \\
++						 genome = "hg19")}
 \\
 
 The function \Rfunction{TEQCreport} provides a quality report for only one sample at a time.
@@ -98,12 +97,12 @@ As an example, let's assume that we have already present TEQC reports for two sa
 \emph{report} and \emph{report2}, respectively. Then the multiple sample report can be created by \\
 
 \noindent
-\Rcode{> multiTEQCreport(singleReportDirs=c("report", "report2"), \\
-+            samplenames=c("Sample A","Sample B"), \\
-+            projectName="Test Project", \\
-+  					 targetsName="Human Exome", \\
-+						 referenceName="Human Genome", \\
-+         	 destDir="multiTEQCreport")}
+\Rcode{> multiTEQCreport(singleReportDirs = c("report", "report2"), \\
++            samplenames = c("Sample A","Sample B"), \\
++            projectName = "Test Project", \\
++  					 targetsName = "Human Exome", \\
++						 referenceName = "Human Genome", \\
++         	 destDir = "multiTEQCreport")}
 \\
 
 For details about the different steps, options and results of a TEQC analysis, it is recommended to
@@ -137,16 +136,17 @@ The input \Rfunarg{targetsfile} does not need to have a fixed format. Just three
 chromosome (as string, e.g. \verb|chr1|), start and end position of each target are required.
 The options \Rfunarg{chrcol}, \Rfunarg{startcol} and \Rfunarg{endcol} specify in which columns of
 the file the respective information is found.
-The output of \Rfunction{get.targets} is of class \Rclass{RangedData} from the \Rpackage{IRanges} package.
+The output of \Rfunction{get.targets} is of class \Rclass{GRanges} from the \Rpackage{GenomicRanges} package.
 Note that overlapping or adjacent targets are merged, such that the returned target regions
 are not-overlapping. Therefore, also a bed file containing information about the hybridization
 probes, which might be highly overlapping due to tiling, can be used as \Rfunarg{targetsfile}.
 
-<<load>>=
+<<load, message=FALSE>>=
 library(TEQC)
 
-exptPath <- system.file("extdata", package="TEQC")
-targets <- get.targets(targetsfile=paste(exptPath, "ExampleSet_Targets.bed", sep="/"), chrcol=1, startcol=2, endcol=3, skip=0)
+exptPath <- system.file("extdata", package = "TEQC")
+targets <- get.targets(targetsfile=paste(exptPath, "ExampleSet_Targets.bed", 
+                    sep="/"), chrcol = 1, startcol = 2, endcol = 3, skip = 0)
 targets
 @
 
@@ -159,14 +159,13 @@ are already 1-based, set the parameter \Rfunarg{zerobased} to \Rfunarg{FALSE} in
 
 We might ask what fraction of the genome is targeted. In the function \Rfunction{fraction.target}
 the corresponding genome
-can be specified by the option \Rfunarg{genome}. At the moment only \Rfunarg{hg18} and \Rfunarg{hg19}
-are available. The corresponding genome sizes are taken from
+can be specified by the option \Rfunarg{genome}. At the moment only \Rfunarg{hg18}, \Rfunarg{hg19} and \Rfunarg{hg38} are available. The corresponding genome sizes are taken from
 \url{http://genomewiki.ucsc.edu/index.php/Genome_size_statistics}. For any other case,
 you can specify the genome size manually with the option \Rfunarg{genomesize}.
 In our little example the total targeted region and hence the fraction within the genome is very small.
 
 <<fraction.target>>=
-ft <- fraction.target(targets, genome="hg19")
+ft <- fraction.target(targets, genome = "hg38")
 ft
 @
 
@@ -179,22 +178,23 @@ not merged. Furthermore, a column containing read identifiers can be specified w
 to be done (also) on read pairs rather than on single reads. In this case the ID has to be the
 identifier of the read pair (i.e. the same unique ID for both reads of the pair). Our example data
 was derived by paired-end sequencing,
-so we keep the pair IDs in the resulting \Rclass{RangedData} object. The genomic positions in our bedfile containing
+so we keep the pair IDs in the resulting \Rclass{GRanges} object. The genomic positions in our bedfile containing
 the reads are 1-based, so we avoid coordinate shifting by setting \Rfunarg{zerobased} to \Rfunarg{FALSE}.
 
 <<reads>>=
-reads <- get.reads(paste(exptPath, "ExampleSet_Reads.bed", sep="/"), chrcol=1, startcol=2, endcol=3, idcol=4, zerobased=F, skip=0)
+reads <- get.reads(paste(exptPath, "ExampleSet_Reads.bed", sep="/"), 
+      chrcol = 1, startcol = 2, endcol = 3, idcol = 4, zerobased = F, skip = 0)
 reads
 @
 
 Whenever BAM files are available, it is recommended to use those instead of bed files as input for \Rfunction{get.reads},
 while setting parameter \Rfunarg{filetype} to \Rfunarg{"bam"}. In this case, \Rfunction{get.reads} makes use
-of the \Rpackage{ShortRead} function \Rfunction{scanBam}, with flag option \Rfunarg{isUnmappedQuery=FALSE}.
-All other previously described options of \Rfunction{get.reads} are ignored, since genomic positions and read
-identifiers are taken automatically from the BAM file.  \\
+of the \Rpackage{ShortRead} function \Rfunction{scanBam}, with flag options \Rfunarg{isUnmappedQuery = FALSE} and Rfunarg{isSecondaryAlignment = FALSE}. Note that multiple matches per read on the genome are not supported. Only primary alignments are read from the BAM file.
+All other previously described options of \Rfunction{get.reads} are ignored, since genomic positions and read identifiers are taken automatically from the BAM file. 
+ \\
 
 \noindent
-\Rcode{> reads <- get.reads("myBAM.bam", filetype="bam")}\\
+\Rcode{> reads <- get.reads("myBAM.bam", filetype = "bam")}\\
 
 \vspace{0.5cm}
 \noindent {\bf Paired-end data}
@@ -202,11 +202,11 @@ identifiers are taken automatically from the BAM file.  \\
 When reads are paired, in order to perform statistics on pairs rather than on single reads,
 the read pairs have to be matched together using function \Rfunction{reads2pairs}. To run the function can be
 quite time consuming, depending on the number of reads. The output is
-a \Rclass{RangedData} object whose ranges start at the first base of the first read
+a \Rclass{GRanges} object whose ranges start at the first base of the first read
 within a read pair and end at the last base of the respective second read. This is equivalent
 to the positions of the DNA molecule that was actually sequenced from both ends.
 The \Rfunarg{reads} table might also contain single reads (i.e. whose corresponding partners did
-not align to the reference). In this case a list of two \Rclass{RangedData} tables will be returned,
+not align to the reference). In this case a list of two \Rclass{GRanges} tables will be returned,
 the first one containing the original positions of the single reads without partners (table \Robject{singleReads}),
 and the other one containing the merged pairs positions (table \Robject{readpairs}).
 The provided reads data might also contain cases where the two reads of a pair align to different chromosomes.
@@ -225,7 +225,7 @@ You may decide to use for all further analyses only "valid pairs", i.e. to exlud
 ended up in the \Robject{singleReads} table (in case there were any). This can be done e.g. in the following way \\
 
 \noindent
-\Rcode{> reads <- reads[!(reads\$ID \%in\% readpairs\$singleReads\$ID), , drop=TRUE]}\\
+\Rcode{> reads <- reads[!(names(reads) \%in\% names(readpairs\$singleReads)), , drop = TRUE]}\\
 
 Again, only for the case of paired-end data, we can visualize the read pair insert sizes,
 i.e. the distances from the start of read 1 to the end of read 2, respectively.
@@ -239,7 +239,7 @@ the true read pair distribution.
 The insert sizes for all read pairs can also be returned using option \Rfunarg{returnInserts = TRUE}. \\
 
 \noindent
-\Rcode{> insert.size.hist(readpairs, breaks=10)}
+\Rcode{> insert.size.hist(readpairs, breaks = 10)}
 
 \begin{figure}[htb!]
 \begin{center}
@@ -291,7 +291,7 @@ chrom.barplot(reads, targets)
 A measure for the capture specificity is the fraction of aligned reads that overlap
 with any target region. It can be calculated by function \Rfunction{fraction.reads.target}.
 The function has an option \Rfunarg{mappingReads} that can be set to \Rfunarg{TRUE} in
-order to retrieve a reduced \Robject{reads} \Rclass{RangedData} table containing only
+order to retrieve a reduced \Robject{reads} \Rclass{GRanges} table containing only
 those reads overlapping target regions.
 
 <<fraction.reads.target>>=
@@ -353,7 +353,7 @@ containing coverages for all bases present in the \Robject{reads} table, the lat
 contains coverages for all targeted bases. For some \Rpackage{TEQC} functions we need either
 one or the other. When option \Rfunarg{perTarget} is set to \Rfunarg{TRUE}, the returned list
 has the additional element \Robject{targetCoverages}. This is the input \Robject{targets}
-\Rclass{RangedData} table, now including as 'values' columns the average coverage
+\Rclass{GRanges} table, now including as 'values' columns the average coverage
 (column \Robject{avgCoverage}) and standard deviation (column \Robject{coverageSD}) per target region.
 Coverage calculations might take a while, depending on the numbers of reads and targets.
 
@@ -385,7 +385,7 @@ targets2 <- readsPerTarget(reads, targets2)
 targets2
 @
 
-The resulting \Rclass{RangedData} table can be converted to a data frame, and as such easily be
+The resulting \Rclass{GRanges} table can be converted to a data frame, and as such easily be
 written to a file, e.g. by \\
 
 \noindent
@@ -455,7 +455,7 @@ in whether large targets are covered by more reads, as expected, since for large
 regions there should also be more hybridization capture probes ("baits").
 Or you might ask whether quite small targets have worse coverage, because the bait tiling
 might not be as good as for larger targets. Those questions can be addressed by the function
-\Rfunction{coverage.targetlength.plot}. As input a \Rclass{RangedData} targets table has
+\Rfunction{coverage.targetlength.plot}. As input a \Rclass{GRanges} targets table has
 to be given that contains the relevant information in the 'values' column(s).
 The graphs are useful for targets of very different lengths. In our example, where
 all the targets are rather small, the figures are not very informative, see figure
@@ -469,7 +469,7 @@ all the targets are rather small, the figures are not very informative, see figu
 \setkeys{Gin}{width=1\textwidth}
 \begin{figure}[htb!]
 \begin{center}
-<<coveragetargetlength, fig=TRUE, echo=F, eps=F, width=10, height=5>>=
+<<coveragetargetlength, fig=TRUE, echo=F, eps=F, width=12, height=5>>=
 par(mfrow=c(1,2))
 coverage.targetlength.plot(targets2, plotcolumn="nReads", pch=16, cex=1.5)
 coverage.targetlength.plot(targets2, plotcolumn="avgCoverage", pch=16, cex=1.5)
@@ -497,7 +497,7 @@ baitsfile <- paste(exptPath, "ExampleSet_Baits.txt", sep="/")
 baits <- get.baits(baitsfile, chrcol=3, startcol=4, endcol=5, seqcol=2)
 @
 
-With the \Robject{baits} \Rclass{RangedData} table and the \Robject{coverageAll}
+With the \Robject{baits} \Rclass{GRanges} table and the \Robject{coverageAll}
 output of \Rfunction{coverage.target} the (normalized) coverage versus GC content plot can be created.
 This can take quite some time, since GC content and average (normalized) coverage have
 to be calculated for every bait. The bait coverages can be returned by setting option
@@ -616,7 +616,7 @@ duplicates.barplot(readpairs, targets, ylab="Fraction of read pairs")
 \end{figure}
 
 
-Unfortunately, it is not possible to distinguish the artfactual duplicates from the naturally occurring ones.
+Unfortunately, it is not possible to distinguish the artefactual duplicates from the naturally occurring ones.
 For that reason it might still be recommendable to remove duplication before further analysis
 by keeping each duplicated read position only once. (Since here we just deal with genomic positions
 and not with the actual reads that might differ in sequence and quality,
@@ -636,16 +636,14 @@ non-duplicated reads from the \Robject{readpairs} table (and in case of duplicat
 of the respective reads) and extracting those from the original \Robject{read} table.
 
 <<collapse2>>=
-dups2 <- duplicated(readpairs)
-ID.nondups <- readpairs$ID[!dups2]
-sel <- reads$ID %in% ID.nondups
-reads.collapsed.pairs <- reads[sel,,drop=T]
+ID.nondups <- names(unique(readpairs))
+reads.collapsed.pairs <- reads[names(reads) %in% ID.nondups,,drop=T]
 @
 
 
 In single-end data it is probable to lose a large number of reads by removing duplicates. When treating our
-example data like single-end sequences, we are left with only \Sexpr{nrow(reads.collapsed)} out
-of originally \Sexpr{nrow(reads)} reads.
+example data like single-end sequences, we are left with only \Sexpr{length(reads.collapsed)} out
+of originally \Sexpr{length(reads)} reads.
 Hence, the actual coverage could decrease dramatically.
 
 <<cov1>>=
@@ -655,7 +653,7 @@ coverage.target(reads.collapsed, targets, perBase=F, perTarget=F)
 Before removing duplicates we calculated a coverage of \Sexpr{round(Coverage$avgTargetCoverage, 1)}.
 
 When using position information of both reads per pair, much less reads are lost, e.g.
-in the example we can keep \Sexpr{nrow(reads.collapsed.pairs)} reads. Therefore, the
+in the example we can keep \Sexpr{length(reads.collapsed.pairs)} reads. Therefore, the
 coverage will not decrease that much.
 
 <<cov2>>=
@@ -676,7 +674,7 @@ To give an example, we create an artificial new sample by removing randomly 10\%
 from our data.
 
 <<newsample>>=
-r <- sample(nrow(reads), 0.1 * nrow(reads))
+r <- sample(length(reads), 0.1 * length(reads))
 reads2 <- reads[-r,,drop=T]
 Coverage2 <- coverage.target(reads2, targets, perBase=T)
 @
@@ -788,8 +786,12 @@ The example data used in this manual was taken from an exome sequencing data set
 
 \section{Session Information}
 
-<<sessioninfo, results=tex>>=
-toLatex(sessionInfo())
+%<<sessioninfo, results=tex>>=
+%toLatex(sessionInfo())
+%@
+<<sessioninfo, message=FALSE>>=
+require(devtools)
+session_info()
 @
 
 %------------------------------------------------------------------------------------------------

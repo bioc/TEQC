@@ -1,18 +1,19 @@
 coverage.targetlength.plot <-
 function(targets, plotcolumn, linecol=2, xlab, ylab, lwd, pch, cex, ...){
 
-  if(ncol(targets) == 0)
+  mctargets <- mcols(targets)
+  if(ncol(mctargets) == 0)
     stop("'targets' does not include values to plot")
 
-  if(is.character(plotcolumn) & !(plotcolumn %in% colnames(targets)))
+  if(is.character(plotcolumn) & !(plotcolumn %in% names(mctargets)))
     stop("selected 'plotcolumn' does not exist")
 
   targetlen <- width(targets)
-  y <- targets[[plotcolumn]]
+  y <- mctargets[,plotcolumn]
 
   # set graphical parameters
   if(is.numeric(plotcolumn))
-    plotcolumn <- colnames(targets)[plotcolumn]
+    plotcolumn <- names(mctargets)[plotcolumn]
   if(missing(xlab)) xlab <- "Target length (bp)"
   if(missing(ylab)) ylab <- plotcolumn
   if(missing(lwd)) lwd <- 3

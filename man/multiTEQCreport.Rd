@@ -45,7 +45,7 @@ targetsfile <- file.path(exptPath, "ExampleSet_Targets.bed")
 targets <- get.targets(targetsfile, skip=0) 
 
 ## simulated 2nd sample
-r <- sample(nrow(reads), 0.1 * nrow(reads))
+r <- sample(length(reads), 0.1 * length(reads))
 reads2 <- reads[-r,,drop=TRUE]
 
 \dontrun{

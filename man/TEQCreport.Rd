@@ -4,7 +4,7 @@
 \description{Creates an automated html report for the complete TEQC analysis of one sample}
 \usage{
 TEQCreport(sampleName = "", targetsName = "", referenceName = "", destDir = "TEQCreport",
-            reads = get.reads(), targets = get.targets(), Offset = 0, pairedend = FALSE, genome = c(NA, "hg19", "hg18"),
+            reads = get.reads(), targets = get.targets(), Offset = 0, pairedend = FALSE, genome = c(NA, "hg38", "hg19", "hg18"),
             genomesize, k=c(1, 2, 3, 5, 10, 20), covthreshold = 8, CovUniformityPlot = FALSE, CovTargetLengthPlot = FALSE, CovGCPlot = FALSE,
             duplicatesPlot = FALSE, baits = get.baits(), WigFiles = FALSE, saveWorkspace = FALSE, figureFormat = c("jpeg", "png", "tiff"))
 }

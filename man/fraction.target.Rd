@@ -3,7 +3,7 @@
 \title{Fraction of the target within the genome}
 \description{Calculates the fraction of the reference genome that is targeted}
 
-\usage{fraction.target(targets, Offset = 0, genome = c(NA, "hg19", "hg18"), genomesize)}
+\usage{fraction.target(targets, Offset = 0, genome = c(NA, "hg38", "hg19", "hg18"), genomesize)}
 
 \arguments{
   \item{targets}{\code{\link[IRanges:RangedData-class]{RangedData}} table containing positions

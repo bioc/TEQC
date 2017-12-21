@@ -8,9 +8,10 @@
 
 \arguments{
   \item{readsfile}{name of bedfile giving the positions of aligned reads}
+  #!!
   \item{filetype}{Input file type. If \code{"bam"}, the .bam file is read using
-  \code{\link[Rsamtools]{scanBam}}, where flag option \code{isUnmappedQuery=FALSE}
-  is used. Defaults to \code{"bed"}}
+  \code{\link[Rsamtools]{scanBam}}, where flag options \code{isUnmappedQuery=FALSE} and \code{isSecondaryAlignment=FALSE} are used. Defaults to \code{"bed"}}
+  # !!
   \item{chrcol}{In which column in the reads bedfile there is the chromosome information
     (chromosome information in the file should be in string format, e.g. "chrX").
     Ignored if \code{filetype = "bam"}.}

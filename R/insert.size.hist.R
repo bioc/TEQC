@@ -1,9 +1,6 @@
 insert.size.hist <-
 
-# !!
-#function(readpairs, returnInserts=FALSE, legendpos="topleft", main, xlab, ylab, breaks, col, ...){
 function(readpairs, returnInserts=FALSE, legendpos="topleft", outline=FALSE, main, xlab, ylab, breaks, col, ...){
-# !!
 
   # in case 'readpairs' contains also 'singleReads'
   if(is.list(readpairs) & ("readpairs" %in% names(readpairs)))
@@ -24,7 +21,6 @@ function(readpairs, returnInserts=FALSE, legendpos="topleft", outline=FALSE, mai
   me <- median(inserts)
   std <- sd(inserts)
 
-# !!
   # if outline=F, remove "outliers" (according to boxplot.stats) before plotting
   if(!outline){
     x.out <- boxplot.stats(inserts)$out
@@ -39,7 +35,6 @@ function(readpairs, returnInserts=FALSE, legendpos="topleft", outline=FALSE, mai
   }
 
   hist(inserts2, freq=TRUE, xlab=xlab, ylab=ylab, breaks=breaks, col=col, main=main, ...)
-# !!
 
   abline(v=c(m - std, m, m + std, me), lty=2, col=c(1,2,1,3), lwd=2)
   legend(legendpos, c(paste("average (", round(m, 2), ")", sep=""),

@@ -14,9 +14,12 @@ function(baitsfile, chrcol=1, startcol=2, endcol=3, seqcol=4, zerobased=TRUE, se
   if(zerobased)
     start(ir) <- start(ir) + 1
 
-  rd <- RangedData(ranges=ir, space=dat[,chrcol], Seq=dat[,seqcol])
-  n.bait <- nrow(rd)
+  # make GRanges object
+  gr <- GRanges(seqnames=dat[,chrcol], ranges=ir, sequence=dat[,seqcol])
+  gr <- sortSeqlevels(gr)
+  gr <- sort(gr)
+  n.bait <- length(gr)
   print(paste("read", n.bait, "hybridization probes"))
-  return(rd)
+  return(gr)
 }
 
