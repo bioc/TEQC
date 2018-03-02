@@ -37,8 +37,14 @@ function(reads, targets, Offset=0, perTarget=TRUE, perBase=TRUE){
    for(chr in chr.targ){
       cov.chr <- covercounts.all[[chr]]
       ir.chr <- ranges(targets[seqnames(targets) == chr,])
-      tmp <- lapply(ir.chr, function(x) cov.chr[x]) 
- 
+      
+      # !! doesn't work anymore w. IRanges_2.13.28 
+      #tmp <- lapply(ir.chr, function(x) cov.chr[x]) 
+      tmp <- list()
+      for(i in 1: length(ir.chr))
+        tmp <- c(tmp, list(cov.chr[ir.chr[i]]))
+      # !!
+      
       # coverage average and SD per target
       if(perTarget){
         avgcov <- sapply(tmp, mean)

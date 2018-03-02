@@ -1,3 +1,9 @@
+CHANGES IN VERSION 4.0.1
+----------------------
+
+fixed problem with IRanges version >=2.13.28 in coverage.target()
+
+
 CHANGES IN VERSION 4.0.0
 ----------------------
 
