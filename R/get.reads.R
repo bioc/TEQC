@@ -10,12 +10,11 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
 
   if(filetype == "bam"){
     # read BAM file
-# !! add flag to read only unique (primary) alignments 
+    # add flag to read only unique (primary) alignments 
     param <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE, isSecondaryAlignment=FALSE), what=c("qname", "pos", "qwidth", "rname"))
     aln <- scanBam(readsfile, param=param)[[1]]
-# !!
+
     # create GRanges object
-    #rd <- with(aln, RangedData(IRanges(pos, width=qwidth), ID=qname,  space=rname))
     gr <- with(aln, GRanges(seqnames=rname, ranges=IRanges(pos, width=qwidth, names=qname)))
   }
 
@@ -30,11 +29,6 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
 
     dat <- read.delim(readsfile, colClasses=colclasses, sep=sep, skip=skip, header=header, ...)
 
-    # sort reads (better for example when calling 'findOverlaps()' several times)
-    #o <- order(dat[,chrcol], dat[,startcol])
-    #if(!identical(o, 1:nrow(dat)))
-    #  dat <- dat[o,]
-
     # make IRanges object
     if(missing(idcol))
       ir <- IRanges(start=dat[,startcol], end=dat[,endcol])
@@ -48,6 +42,10 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
     # make GRanges object
     gr <- GRanges(seqnames=dat[,chrcol], ranges=ir)
   }
+
+# !!
+  # remove chromosomes (seqlevels) without reads (ranges)
+  gr <- keepSeqlevels(gr, seqlevelsInUse(reads)) 
 
   # check for Illumina read pair IDs - #0/1 and #0/2 have to be removed
   #if(length(colnames(rd)) > 0){
