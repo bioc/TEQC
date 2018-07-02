@@ -45,7 +45,7 @@ function(readsfile, filetype=c("bed", "bam"), chrcol=1, startcol=2, endcol=3, id
 
 # !!
   # remove chromosomes (seqlevels) without reads (ranges)
-  gr <- keepSeqlevels(gr, seqlevelsInUse(reads)) 
+  gr <- keepSeqlevels(gr, seqlevelsInUse(gr)) 
 
   # check for Illumina read pair IDs - #0/1 and #0/2 have to be removed
   #if(length(colnames(rd)) > 0){
