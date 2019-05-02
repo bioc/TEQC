@@ -1,7 +1,7 @@
 Package: TEQC
 Type: Package
 Title: Quality control for target capture experiments
-Version: 4.6.0
+Version: 4.7.0
 Date: 2018-03-13
 Author: M. Hummel, S. Bonnin, E. Lowy, G. Roma
 Maintainer: Manuela Hummel <m.hummel@dkfz.de>
