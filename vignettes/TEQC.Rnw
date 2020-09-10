@@ -786,13 +786,13 @@ The example data used in this manual was taken from an exome sequencing data set
 
 \section{Session Information}
 
-%<<sessioninfo, results=tex>>=
-%toLatex(sessionInfo())
-%@
-<<sessioninfo, message=FALSE>>=
-require(devtools)
-session_info()
+<<sessioninfo, results=tex>>=
+toLatex(sessionInfo())
 @
+%<<sessioninfo, message=FALSE>>=
+%require(devtools)
+%session_info()
+%@
 
 %------------------------------------------------------------------------------------------------
 %------------------------------------------------------------------------------------------------

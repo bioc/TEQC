@@ -4,13 +4,13 @@ citEntry(entry="Manual",
     title = "TEQC: Quality control for target capture experiments",
     author = personList(as.person("M. Hummel"), as.person("S. Bonnin"),
 	as.person("E. Lowy"), as.person("G. Roma")),
-    year = substring(packageDescription("TEQC")$Date,1,4),
-    note = paste("R package version", packageDescription("TEQC")$Version),
+    year = substring(meta$Date,1,4),
+    note = paste("R package version", meta$Version),
     textVersion =
       paste("M. Hummel, S. Bonnin, E. Lowy and G. Roma (",
-        substring(packageDescription("TEQC")$Date,1,4),
+        substring(meta$Date,1,4),
         ") TEQC ",
-        "R package, version ", packageDescription("TEQC")$Version,
+        "R package, version ", meta$Version,
         ".", sep = "")
 )
 
