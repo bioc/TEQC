@@ -1,4 +1,4 @@
-import(methods, BiocGenerics, IRanges, Rsamtools, hwriter)
+import(methods, BiocGenerics, S4Vectors, IRanges, Seqinfo, GenomicRanges, Rsamtools, hwriter)
 
 importFrom(Biobase, addVigs2WinMenu, copySubstitute)
 #importFrom(hwriter, hwrite, hwriteImage)
